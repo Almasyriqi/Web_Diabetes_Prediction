@@ -6,6 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from PIL import Image
 import streamlit as st
+import os
 
 # Create a title and sub-title
 st.write("""
@@ -13,12 +14,19 @@ st.write("""
 Detect if someone has diabetes using machine learning and python !
 """)
 
+# get path file
+project_path = os.path.abspath(os.path.dirname(__file__))
+image_filename = "jti.jpg"
+csv_filename = "diabetes.csv"
+image_path = os.path.join(project_path, image_filename)
+csv_path = os.path.join(project_path, csv_filename)
+
 # Open and display an image
-image = Image.open('D:/jti.jpg')
+image = Image.open(image_path)
 st.image(image, caption='ML', use_column_width=True)
 
 # Get the data
-df = pd.read_csv('D:/Kuliah/Semester 4/Machine Learning/Pertemuan 16/Diabetes.csv')
+df = pd.read_csv(csv_path)
 
 # Set a subheader
 st.subheader('Data Information : ')
@@ -82,5 +90,3 @@ prediction = RandomForestClassifier.predict(user_input)
 # Set a subheader and display the classification
 st.subheader('Classification : ')
 st.write(prediction)
-
-

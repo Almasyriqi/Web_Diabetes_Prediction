@@ -8,9 +8,9 @@ Pengguna memasukkan data kesehatan (jumlah kehamilan, kadar glukosa, tekanan dar
 
 | Komponen | Teknologi |
 |---|---|
-| UI & Server | [Streamlit](https://streamlit.io/) `1.10.0` |
+| UI & Server | [Streamlit](https://streamlit.io/) `1.32.0` |
 | Machine Learning | [scikit-learn](https://scikit-learn.org/) `1.2.2` (`RandomForestClassifier`) |
-| Pengolahan Data | [pandas](https://pandas.pydata.org/) |
+| Pengolahan Data | [pandas](https://pandas.pydata.org/) `2.3.3` |
 | Pengolahan Gambar | [Pillow](https://python-pillow.org/) `9.5.0` |
 | Bahasa | Python |
 
@@ -18,8 +18,8 @@ Pengguna memasukkan data kesehatan (jumlah kehamilan, kadar glukosa, tekanan dar
 
 - Menampilkan dataset mentah beserta statistik deskriptifnya (`df.describe()`) dan visualisasi bar chart.
 - Input data kesehatan pengguna melalui 8 slider interaktif di sidebar (pregnancies, glucose, blood pressure, skin thickness, insulin, BMI, diabetes pedigree function, age).
-- Melatih model `RandomForestClassifier` secara langsung dari dataset dan menampilkan skor akurasinya.
-- Klasifikasi/prediksi apakah data yang dimasukkan pengguna terindikasi diabetes (1) atau tidak (0).
+- Melatih model `RandomForestClassifier` (dengan `random_state` tetap) dari dataset, di-cache (`st.cache_data`/`st.cache_resource`) agar tidak dilatih ulang setiap interaksi, dan menampilkan skor akurasinya.
+- Klasifikasi/prediksi apakah data yang dimasukkan pengguna terindikasi diabetes, ditampilkan sebagai label yang mudah dipahami beserta skor probabilitasnya.
 - Tampilan dengan tema dark mode.
 
 Detail lengkap fitur ada di [`docs/FEATURES.md`](docs/FEATURES.md).
@@ -43,9 +43,7 @@ Aplikasi ini menggunakan dataset **Pima Indians Diabetes** (`diabetes.csv`), ter
 3. Install dependency:
    ```bash
    pip install -r requirements.txt
-   pip install pandas
    ```
-   > `pandas` digunakan langsung oleh aplikasi tetapi belum tercantum di `requirements.txt`, sehingga perlu diinstall secara manual. Lihat [Known Issues di SRS](docs/SRS.md#6-known-issues--batasan-teknis-saat-ini).
 4. Jalankan aplikasi:
    ```bash
    streamlit run WebApp.py
@@ -77,7 +75,7 @@ Web_Diabetes_Prediction/
 
 ## Catatan Keterbatasan
 
-Project ini masih berupa prototipe/tugas kuliah dengan beberapa keterbatasan teknis (model tidak persisten, dilatih ulang setiap interaksi, dependency belum lengkap ter-pin, dll). Detail dan rekomendasi perbaikan dijelaskan di bagian *Known Issues* pada [`docs/SRS.md`](docs/SRS.md#6-known-issues--batasan-teknis-saat-ini).
+Project ini masih berupa prototipe/tugas kuliah. Beberapa keterbatasan awal (dependency belum ter-pin, model dilatih ulang setiap interaksi, output prediksi mentah) sudah diperbaiki, namun masih ada keterbatasan lain yang berlaku (belum ada automated test/CI, belum ada file LICENSE, model tidak dipersist ke file di disk). Detail lengkap ada di bagian *Known Issues* pada [`docs/SRS.md`](docs/SRS.md#6-known-issues--batasan-teknis-saat-ini).
 
 ## Lisensi
 

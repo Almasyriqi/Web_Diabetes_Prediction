@@ -7,7 +7,7 @@ Dokumen ini merinci seluruh fitur yang tersedia saat ini pada aplikasi (`WebApp.
 **Deskripsi**: Menampilkan dataset `diabetes.csv` yang digunakan untuk melatih model.
 
 **Cara kerja**:
-- Dataset dibaca menggunakan `pandas.read_csv()`.
+- Dataset dibaca menggunakan `pandas.read_csv()`, dibungkus fungsi yang di-cache dengan `st.cache_data` sehingga file hanya dibaca dari disk sekali per proses server.
 - Ditampilkan sebagai tabel interaktif (`st.dataframe(df)`).
 - Statistik deskriptif (count, mean, std, min, max, kuartil) ditampilkan melalui `df.describe()`.
 - Seluruh kolom dataset divisualisasikan sekaligus dalam satu bar chart (`st.bar_chart(df)`).
@@ -41,15 +41,14 @@ Dokumen ini merinci seluruh fitur yang tersedia saat ini pada aplikasi (`WebApp.
 
 **Cara kerja**:
 - Fitur (`X`) diambil dari 8 kolom pertama dataset, label (`Y`) dari kolom `Outcome`.
-- Model dilatih (`fit`) pada data latih.
-- Akurasi dihitung menggunakan `accuracy_score` terhadap data uji dan ditampilkan sebagai persentase.
-- **Catatan**: proses pelatihan ini terjadi ulang setiap kali ada interaksi pengguna (lihat [Known Issues di SRS](SRS.md#6-known-issues--batasan-teknis-saat-ini)), sehingga skor akurasi dapat sedikit berbeda antar reload karena model tidak menggunakan `random_state` tetap.
+- Model (`RandomForestClassifier(random_state=0)`) dilatih (`fit`) pada data latih di dalam fungsi yang dibungkus `st.cache_resource`, sehingga pelatihan hanya berjalan sekali per proses server — interaksi pengguna berikutnya (menggeser slider) tidak memicu pelatihan ulang.
+- Akurasi dihitung menggunakan `accuracy_score` terhadap data uji dan ditampilkan sebagai persentase. Karena model memakai `random_state` tetap, skor akurasi konsisten antar reload selama dataset sama.
 
 ## 5. Klasifikasi/Prediksi Diabetes
 
 **Deskripsi**: Fitur inti aplikasi — memprediksi apakah data kesehatan yang dimasukkan pengguna mengindikasikan diabetes.
 
-**Cara kerja**: Model yang sudah dilatih menjalankan `predict()` terhadap data input pengguna, hasilnya berupa array berisi `0` (tidak diabetes) atau `1` (diabetes), ditampilkan langsung ke pengguna.
+**Cara kerja**: Model yang sudah dilatih menjalankan `predict()` dan `predict_proba()` terhadap data input pengguna. Hasilnya diterjemahkan menjadi label yang mudah dipahami — "Terindikasi Diabetes" atau "Tidak Terindikasi Diabetes" — beserta skor probabilitasnya (mis. "Terindikasi Diabetes (probabilitas: 78.00%)").
 
 ## 6. Tampilan Dark Mode
 
@@ -67,7 +66,6 @@ Bagian ini mencatat fitur yang **belum** ada pada aplikasi saat ini, sebagai ref
 
 - Riwayat/penyimpanan hasil prediksi pengguna (saat ini tidak disimpan sama sekali).
 - Sistem autentikasi/login pengguna.
-- Model yang tersimpan permanen (saat ini dilatih ulang setiap kali).
-- Label hasil prediksi yang ramah pengguna beserta skor probabilitas (saat ini hanya angka `0`/`1` mentah).
+- Model yang dipersist ke file di disk (mis. `.pkl`/`.joblib`). Saat ini model di-cache di memori selama proses server berjalan (`st.cache_resource`), tetapi tetap dilatih ulang sekali setiap kali server di-restart.
 - Multi-halaman atau navigasi antar-page.
 - Unggah dataset kustom oleh pengguna (dataset saat ini statis/tetap).

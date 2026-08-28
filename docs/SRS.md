@@ -48,18 +48,18 @@ Pengguna umum (mahasiswa, dosen, atau siapa pun yang tertarik dengan demonstrasi
 | RF-03 | Menampilkan visualisasi data | Sistem menampilkan bar chart dari seluruh kolom dataset. |
 | RF-04 | Input parameter kesehatan | Sistem menyediakan 8 slider di sidebar untuk input: pregnancies, glucose, blood_pressure, skin_thickness, insulin, BMI, DPF, dan age, masing-masing dengan rentang nilai dan default sesuai karakteristik dataset. |
 | RF-05 | Menampilkan input pengguna | Sistem menampilkan kembali nilai yang telah dimasukkan pengguna dalam bentuk tabel sebagai konfirmasi. |
-| RF-06 | Pelatihan model | Sistem membagi dataset menjadi data latih (75%) dan data uji (25%), lalu melatih `RandomForestClassifier` pada data latih. |
+| RF-06 | Pelatihan model | Sistem membagi dataset menjadi data latih (75%) dan data uji (25%), lalu melatih `RandomForestClassifier` (dengan `random_state` tetap) pada data latih. Proses load data dan training di-cache (`st.cache_data`/`st.cache_resource`) sehingga hanya dijalankan sekali per proses server, bukan pada setiap interaksi pengguna. |
 | RF-07 | Menampilkan akurasi model | Sistem menghitung dan menampilkan akurasi model terhadap data uji. |
-| RF-08 | Klasifikasi/prediksi | Sistem menjalankan prediksi model terhadap data yang dimasukkan pengguna dan menampilkan hasilnya (0 atau 1). |
+| RF-08 | Klasifikasi/prediksi | Sistem menjalankan prediksi model terhadap data yang dimasukkan pengguna dan menampilkan hasilnya sebagai label yang mudah dipahami ("Terindikasi Diabetes" / "Tidak Terindikasi Diabetes") beserta skor probabilitasnya. |
 
 ## 4. Kebutuhan Non-Fungsional
 
 | Kategori | Kebutuhan |
 |---|---|
-| Performa | Waktu respons bergantung pada kecepatan pelatihan ulang model setiap kali terjadi interaksi (lihat catatan pada bagian Known Issues) karena tidak ada caching. |
+| Performa | Load dataset dan pelatihan model di-cache (`st.cache_data`/`st.cache_resource`), sehingga hanya dijalankan sekali per proses server — interaksi pengguna berikutnya (menggeser slider) tidak lagi memicu pelatihan ulang, hanya menjalankan ulang langkah input & prediksi. |
 | Usability | Antarmuka harus tetap sederhana dan dapat digunakan tanpa panduan khusus, memanfaatkan komponen bawaan Streamlit (slider, tabel, chart). |
 | Portabilitas | Aplikasi harus dapat dijalankan di lingkungan mana pun yang memiliki Python dan dependency pada `requirements.txt` terinstall, tanpa konfigurasi tambahan (database, environment variable, dsb.). |
-| Kompatibilitas | Aplikasi harus kompatibel dengan versi package yang tertera di `requirements.txt` (Streamlit 1.10.0, scikit-learn 1.2.2, Pillow 9.5.0). |
+| Kompatibilitas | Aplikasi harus kompatibel dengan versi package yang tertera di `requirements.txt` (Streamlit 1.32.0, scikit-learn 1.2.2, Pillow 9.5.0, pandas 2.3.3). |
 | Keamanan & Privasi Data | Tidak ada kebutuhan khusus karena aplikasi tidak menyimpan data pengguna secara permanen — seluruh input hanya berada di memori sesi browser. |
 
 ## 5. Kebutuhan Data
@@ -72,13 +72,21 @@ Pengguna umum (mahasiswa, dosen, atau siapa pun yang tertarik dengan demonstrasi
 
 ## 6. Known Issues / Batasan Teknis Saat Ini
 
-Bagian ini mencatat gap teknis nyata yang ditemukan pada kondisi kode saat ini (`WebApp.py`), sebagai referensi untuk pengembangan lanjutan — bukan requirement yang sudah dipenuhi:
+### 6.1 Sudah Diperbaiki
 
-1. **Dependency `pandas` belum ter-pin** di `requirements.txt`, padahal digunakan langsung oleh aplikasi (`import pandas as pd`). Saat ini terpasang secara transitif melalui dependency package lain, sehingga rawan patah jika lingkungan instalasi berubah.
-2. **Model tidak diberi `random_state`**, sehingga skor akurasi yang ditampilkan dapat berbeda-beda setiap kali aplikasi dijalankan ulang, meskipun dataset sama.
-3. **Model dilatih ulang dari nol pada setiap interaksi pengguna** (setiap slider digeser memicu rerun seluruh script Streamlit), karena tidak ada mekanisme caching (`st.cache_data`/`st.cache_resource`) maupun penyimpanan model terlatih. Ini berdampak pada performa terutama jika dataset bertambah besar.
-4. **Hasil prediksi ditampilkan dalam bentuk mentah** (`0` atau `1`) tanpa label yang mudah dipahami pengguna awam (mis. "Terindikasi Diabetes" / "Tidak Terindikasi Diabetes") dan tanpa skor probabilitas.
-5. **Tidak ada file `LICENSE`** pada repository.
-6. **Tidak ada automated test maupun CI/CD** untuk memvalidasi perubahan kode.
+Poin-poin berikut sebelumnya tercatat sebagai gap teknis dan **sudah diperbaiki**:
+
+1. ~~Dependency `pandas` belum ter-pin di `requirements.txt`~~ — sudah ditambahkan (`pandas==2.3.3`).
+2. ~~Model tidak diberi `random_state`~~ — `RandomForestClassifier` kini memakai `random_state=0`, sehingga akurasi konsisten antar reload.
+3. ~~Model dilatih ulang dari nol pada setiap interaksi pengguna~~ — load dataset dan training model kini di-cache masing-masing dengan `st.cache_data` dan `st.cache_resource` (mensyaratkan `streamlit>=1.18`, di-pin ke `1.32.0`), sehingga hanya dijalankan sekali per proses server.
+4. ~~Hasil prediksi ditampilkan dalam bentuk mentah (`0`/`1`)~~ — kini ditampilkan sebagai label ramah pengguna ("Terindikasi Diabetes" / "Tidak Terindikasi Diabetes") disertai skor probabilitas dari `predict_proba`.
+
+### 6.2 Masih Berlaku
+
+Bagian ini mencatat gap teknis yang **masih ada** pada kondisi kode saat ini, sebagai referensi untuk pengembangan lanjutan:
+
+1. **Model tidak dipersist ke file di disk** (mis. `.pkl`/`.joblib`). `st.cache_resource` hanya menyimpan model di memori selama proses server Streamlit berjalan — begitu server di-restart, model dilatih ulang sekali dari awal.
+2. **Tidak ada file `LICENSE`** pada repository.
+3. **Tidak ada automated test maupun CI/CD** untuk memvalidasi perubahan kode.
 
 Rekomendasi perbaikan untuk poin-poin di atas dijelaskan lebih lanjut pada penutup [`Readme.md`](../Readme.md).

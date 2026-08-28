@@ -25,8 +25,12 @@ csv_path = os.path.join(project_path, csv_filename)
 image = Image.open(image_path)
 st.image(image, caption='ML', use_column_width=True)
 
-# Get the data
-df = pd.read_csv(csv_path)
+# Get the data (cached so it's only read from disk once)
+@st.cache_data
+def load_data(path):
+    return pd.read_csv(path)
+
+df = load_data(csv_path)
 
 # Set a subheader
 st.subheader('Data Information : ')
@@ -76,17 +80,25 @@ user_input = get_user_input()
 st.subheader('User Input : ')
 st.write(user_input)
 
-# Create and train the model
-RandomForestClassifier = RandomForestClassifier()
-RandomForestClassifier.fit(X_train, Y_train)
+# Create and train the model (cached so it's only trained once per data/params)
+@st.cache_resource
+def train_model(X_train, Y_train):
+    model = RandomForestClassifier(random_state=0)
+    model.fit(X_train, Y_train)
+    return model
+
+model = train_model(X_train, Y_train)
 
 # Show the models metrics
 st.subheader('Model Test Accuracy Score : ')
-st.write(str(accuracy_score(Y_test, RandomForestClassifier.predict(X_test)) * 100)+ '%')
+st.write(str(accuracy_score(Y_test, model.predict(X_test)) * 100)+ '%')
 
 # Store the models predictions in a variable
-prediction = RandomForestClassifier.predict(user_input)
+prediction = model.predict(user_input)
+prediction_proba = model.predict_proba(user_input)
 
 # Set a subheader and display the classification
 st.subheader('Classification : ')
-st.write(prediction)
+label = 'Terindikasi Diabetes' if prediction[0] == 1 else 'Tidak Terindikasi Diabetes'
+probability = prediction_proba[0][prediction[0]] * 100
+st.write(f'{label} (probabilitas: {probability:.2f}%)')

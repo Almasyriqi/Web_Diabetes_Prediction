@@ -59,7 +59,9 @@ Web_Diabetes_Prediction/
 ├── docs/                   # Dokumentasi project
 │   ├── SRS.md              # Software Requirement Specification
 │   ├── FEATURES.md         # Daftar & penjelasan fitur
-│   └── FLOWMAP.md          # Alur/flow map aplikasi
+│   ├── FLOWMAP.md          # Alur/flow map aplikasi
+│   ├── MANUAL_BOOK.md      # Panduan pengguna bergambar
+│   └── images/             # Screenshot untuk MANUAL_BOOK.md
 ├── diabetes.csv            # Dataset Pima Indians Diabetes
 ├── jti.jpg                 # Banner/logo yang ditampilkan di halaman
 ├── requirements.txt        # Daftar dependency Python
@@ -69,6 +71,7 @@ Web_Diabetes_Prediction/
 
 ## Dokumentasi Lengkap
 
+- [Manual Book (Panduan Pengguna Bergambar)](docs/MANUAL_BOOK.md)
 - [Software Requirement Specification (SRS)](docs/SRS.md)
 - [Daftar Fitur](docs/FEATURES.md)
 - [Flow Map Aplikasi](docs/FLOWMAP.md)

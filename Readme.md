@@ -61,6 +61,7 @@ Web_Diabetes_Prediction/
 │   ├── FEATURES.md         # Daftar & penjelasan fitur
 │   ├── FLOWMAP.md          # Alur/flow map aplikasi
 │   ├── MANUAL_BOOK.md      # Panduan pengguna bergambar
+│   ├── MANUAL_BOOK.pdf     # Versi PDF dari MANUAL_BOOK.md
 │   └── images/             # Screenshot untuk MANUAL_BOOK.md
 ├── diabetes.csv            # Dataset Pima Indians Diabetes
 ├── jti.jpg                 # Banner/logo yang ditampilkan di halaman
@@ -71,7 +72,7 @@ Web_Diabetes_Prediction/
 
 ## Dokumentasi Lengkap
 
-- [Manual Book (Panduan Pengguna Bergambar)](docs/MANUAL_BOOK.md)
+- [Manual Book (Panduan Pengguna Bergambar)](docs/MANUAL_BOOK.md) ([PDF](docs/MANUAL_BOOK.pdf))
 - [Software Requirement Specification (SRS)](docs/SRS.md)
 - [Daftar Fitur](docs/FEATURES.md)
 - [Flow Map Aplikasi](docs/FLOWMAP.md)
